@@ -255,6 +255,10 @@ def usersPage() {
             input name: "sms", title: "Send SMS notification to (optional):", type: "phone", required: false
             paragraph "Enable the below option if you DON'T want push notifications on your SmartThings phone app. This does not impact the SMS notifications."
             input name: "disableAllNotify", title: "Disable all push notifications", type: "bool", defaultValue: "false", required: true
+            input name: "enableVoiceNotify", title: "Enable Voicenotifications", type: "bool", defaultValue: "false", required: true, submitOnChange: true
+			if(enableVoiceNotify) {
+            	input "Speakers","capability.musicPlayer", title: "Lock", multiple: true, requred: true
+			}
         }
 
         section("Jammed Lock") {
@@ -723,6 +727,7 @@ def lockHandler(evt) {
                 if (manualNotify && (manualNotifyModes ? manualNotifyModes.find{it == location.currentMode} : true)) {
                     if (!disableAllNotify) {
                         sendPush "$evt.displayName was unlocked manually"
+                        voiceNotify("$evt.displayName was unlocked manually")
                     } else {
                         sendNotificationEvent("$evt.displayName was unlocked manually")
                     }
@@ -840,6 +845,7 @@ def lockHandler(evt) {
                     if (userName == null) {
                         if (!disableAllNotify) {
                             sendPush "$evt.displayName was unlocked by Unknown User from slot $i"
+                            voiceNotify("$evt.displayName was unlocked by Unknown User from slot $i")
                         } else {
                             sendNotificationEvent("$evt.displayName was unlocked by Unknown User from slot $i")
                         }
@@ -850,6 +856,7 @@ def lockHandler(evt) {
                     else {
                         if (!disableAllNotify) {
                             sendPush "$evt.displayName was unlocked by $userName"
+                            voiceNotify("$evt.displayName was unlocked by $userName")
                         } else {
                             sendNotificationEvent("$evt.displayName was unlocked by $userName")
                         }
@@ -884,6 +891,7 @@ def lockHandler(evt) {
             if (lockNotify && (lockNotifyModes ? lockNotifyModes.find{it == location.currentMode} : true)) {
                 if (!disableAllNotify) {
                     sendPush "$evt.displayName was locked $lockMode"
+                    voiceNotify("$evt.displayName was locked $lockMode")
                 } else {
                     sendNotificationEvent("$evt.displayName was locked $lockMode")
                 }
@@ -896,6 +904,7 @@ def lockHandler(evt) {
             if (jamNotify) {
                 if (!disableAllNotify) {
                     sendPush "$evt.displayName lock is Jammed!"
+                    voiceNotify("$evt.displayName lock is Jammed!")
                 } else {
                     sendNotificationEvent("$evt.displayName lock is Jammed!")
                 }
@@ -908,6 +917,7 @@ def lockHandler(evt) {
         log.debug "Lock $evt.displayName, invalid user code: $evt.value"
         if (!disableAllNotify) {
             sendPush "Too many invalid user codes detected on lock $evt.displayName"
+            voiceNotify("Too many invalid user codes detected on lock $evt.displayName")
         } else {
             sendNotificationEvent("Too many invalid user codes detected on lock $evt.displayName")
         }
@@ -917,6 +927,13 @@ def lockHandler(evt) {
     }
 }
 
+def voiceNotify(phrase) {
+	if(enableVoiceNotify) {
+		Speakers.each(){
+    		it.speak(phrase)
+    	}
+	}
+}
 def initializeCodes() {
     TimeZone timeZone = location.timeZone
     if (!timeZone) {
