@@ -258,6 +258,7 @@ def usersPage() {
             input name: "enableVoiceNotify", title: "Enable Voicenotifications", type: "bool", defaultValue: "false", required: true, submitOnChange: true
 			if(enableVoiceNotify) {
             	input "Speakers","capability.musicPlayer", title: "Lock", multiple: true, requred: true
+                input "SpeakerVolume", "number", title: "Set volume to (1-100%):", required: false
 			}
         }
 
@@ -930,6 +931,10 @@ def lockHandler(evt) {
 def voiceNotify(phrase) {
 	if(enableVoiceNotify) {
 		Speakers.each(){
+			if(SpeakerVolume)
+			{
+				it.setVolume(SpeakerVolume);
+			}
     		it.speak(phrase)
     	}
 	}
