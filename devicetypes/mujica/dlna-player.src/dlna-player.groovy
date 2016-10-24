@@ -50,6 +50,7 @@ metadata {
 		command "setDoNotDisturb", ["string"]
 		command "switchDoNotDisturb"
 		command "speak", ["string"]
+		command "setVolume", ["number"]
 		command "playTrack", ["string","string"]
 	}
 
