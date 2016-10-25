@@ -77,6 +77,9 @@ def initialize() {
     }
 }
 
+def createZones() {
+	
+}
 def checkAlarm() {
 	log.debug "Check Alarm"
     runIn(60, checkAlarm)
@@ -198,7 +201,7 @@ def alarmStatusUpdate(evt) {
 private callAlarmServer(path) {
 	try {
         sendHubCommand(new physicalgraph.device.HubAction(
-            method: "POST",
+            method: "GET",
             path: path,
             headers: [
                 HOST: "${ip}:${port}"

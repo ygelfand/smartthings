@@ -1,9 +1,9 @@
 /*
  *  DSC Alarm Panel integration via REST API callbacks
  *
- *  Author: Kent Holloway <drizit@gmail.com>
- *  Modified by: Matt Martz <matt.martz@gmail.com>
  */
+
+import groovy.json.JsonSlurper;
 
 definition(
     name: "DSC Integration",
