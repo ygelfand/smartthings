@@ -35,6 +35,9 @@ preferences {
 }
 
 mappings {
+  path('/update')            { action: [POST: 'update'] }
+  path('/installzones')      { action: [POST: 'installzones'] }
+  path('/installpartitions') { action: [POST: 'installpartitions'] }
   path("/panel/:eventcode/:zoneorpart") {
     action: [
       GET: "updateZoneOrPartition"
@@ -64,6 +67,138 @@ def initialize() {
     subscribe(thecommand, "switch", switchUpdate)
     //Subscribe to responses from sendHubCommand
     subscribe(location, null, lanResponseHandler, [filterEvents:false])
+}
+
+
+
+def installzones() {
+  def children = getChildDevices()
+  def zones = request.JSON
+
+  def zoneMap = [
+    'contact':'DSC Zone Contact',
+    'motion':'DSC Zone Motion',
+    'smoke':'DSC Zone Smoke',
+    'co':'DSC Zone CO',
+    'flood':'DSC Zone Flood',
+  ]
+
+  log.debug "children are ${children}"
+  for (zone in zones) {
+    def id = zone.key
+    def type = zone.value.'type'
+    def device = zoneMap."${type}"
+    def name = zone.value.'name'
+    def networkId = "dsczone${id}"
+    def zoneDevice = children.find { item -> item.device.deviceNetworkId == networkId }
+
+    if (zoneDevice == null) {
+      log.debug "add new child: device: ${device} networkId: ${networkId} name: ${name}"
+      zoneDevice = addChildDevice('dsc', "${device}", networkId, null, [name: "${name}", label:"${name}", completedSetup: true])
+    } else {
+      log.debug "zone device was ${zoneDevice}"
+      try {
+        log.debug "trying name update for ${networkId}"
+        zoneDevice.name = "${name}"
+        log.debug "trying label update for ${networkId}"
+        zoneDevice.label = "${name}"
+      } catch(IllegalArgumentException e) {
+        log.debug "excepted for ${networkId}"
+         if ("${e}".contains('identifier required')) {
+           log.debug "Attempted update but device didn't exist. Creating ${networkId}"
+           zoneDevice = addChildDevice("dsc", "${device}", networkId, null, [name: "${name}", label:"${name}", completedSetup: true])
+         } else {
+           log.error "${e}"
+         }
+      }
+    }
+  }
+
+  for (child in children) {
+    if (child.device.deviceNetworkId.contains('dsczone')) {
+      def zone = child.device.deviceNetworkId.minus('dsczone')
+      def jsonZone = zones.find { x -> "${x.key}" == "${zone}"}
+      if (jsonZone == null) {
+        try {
+          log.debug "Deleting device ${child.device.deviceNetworkId} ${child.device.name} as it was not in the config"
+          deleteChildDevice(child.device.deviceNetworkId)
+        } catch(MissingMethodException e) {
+          if ("${e}".contains('types: (null) values: [null]')) {
+            log.debug "Device ${child.device.deviceNetworkId} was empty, likely deleted already."
+          } else {
+             log.error e
+          }
+        }
+      }
+    }
+  }
+}
+
+def installpartitions() {
+  def children = getChildDevices()
+  def partitions = request.JSON
+
+  def partMap = [
+    'stay':'DSC Stay Panel',
+    'away':'DSC Away Panel',
+    'simplestay':'DSC Simple Stay Panel',
+    'simpleaway':'DSC Simple Away Panel',
+  ]
+
+  log.debug "children are ${children}"
+  for (part in partitions) {
+    def id = part.key
+
+    for (p in part.value) {
+      def type = p.key
+      def name = p.value
+      def networkId = "dsc${type}${id}"
+      def partDevice = children.find { item -> item.device.deviceNetworkId == networkId }
+      def device = partMap."${type}"
+
+      if (partDevice == null) {
+        log.debug "add new child: device: ${device} networkId: ${networkId} name: ${name}"
+        partDevice = addChildDevice('dsc', "${device}", networkId, null, [name: "${name}", label:"${name}", completedSetup: true])
+      } else {
+        log.debug "part device was ${partDevice}"
+        try {
+          log.debug "trying name update for ${networkId}"
+          partDevice.name = "${name}"
+          log.debug "trying label update for ${networkId}"
+          partDevice.label = "${name}"
+        } catch(IllegalArgumentException e) {
+          log.debug "excepted for ${networkId}"
+           if ("${e}".contains('identifier required')) {
+             log.debug "Attempted update but device didn't exist. Creating ${networkId}"
+             partDevice = addChildDevice('dsc', "${device}", networkId, null, [name: "${name}", label:"${name}", completedSetup: true])
+           } else {
+             log.error "${e}"
+           }
+        }
+      }
+    }
+  }
+
+  for (child in children) {
+    for (p in ['stay', 'away']) {
+        if (child.device.deviceNetworkId.contains("dsc${p}")) {
+        def part = child.device.deviceNetworkId.minus("dsc${p}")
+        def jsonPart = partitions.find { x -> x.value."${p}" }
+        if (jsonPart== null) {
+          try {
+            log.debug "Deleting device ${child.device.deviceNetworkId} ${child.device.name} as it was not in the config"
+            deleteChildDevice(child.device.deviceNetworkId)
+          } catch(MissingMethodException e) {
+            if ("${e}".contains('types: (null) values: [null]')) {
+              log.debug "Device ${child.device.deviceNetworkId} was empty, likely deleted already."
+            } else {
+              log.error e
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 
