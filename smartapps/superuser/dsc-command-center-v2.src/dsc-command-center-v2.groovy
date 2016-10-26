@@ -77,9 +77,6 @@ def initialize() {
     }
 }
 
-def createZones() {
-	
-}
 def checkAlarm() {
 	log.debug "Check Alarm"
     runIn(60, checkAlarm)
