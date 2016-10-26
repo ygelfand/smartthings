@@ -38,7 +38,7 @@ metadata {
 				attributeState "disarm", label:'Disarmed - Ready', icon:"st.security.alarm.off", backgroundColor:"#79b821"
 				attributeState "arm", label:'Armed - Away', icon:"st.security.alarm.on", backgroundColor:"#800000"
 				attributeState "stayarm", label:'Armed - Stay', icon:"st.security.alarm.on", backgroundColor:"#008CC1"
-				attributeState "armed",     label: 'Armed',      backgroundColor: "#79b821", icon:"st.Home.home3"
+				attributeState "armed",     label: 'Armed',      backgroundColor: "#800000", icon:"st.Home.home3"
                 attributeState "exitdelay", label: 'Exit Delay', backgroundColor: "#ff9900", icon:"st.Home.home3"
       			attributeState "entrydelay",label: 'EntryDelay', backgroundColor: "#ff9900", icon:"st.Home.home3"
  			    attributeState "notready",  label: 'Open',       backgroundColor: "#ffcc00", icon:"st.Home.home2"
@@ -81,21 +81,13 @@ def partition(String state, String partition) {
 
 // handle commands
 def arm() {
-	log.debug "Executing 'arm'"
     parent.switchUpdate("arm")
-    //sendEvent (name: "switch", value: "arm")
 }
 
 def stayarm() {
-	log.debug "Executing 'stayarm'"
     parent.switchUpdate("stayarm")
-
-   // sendEvent (name: "switch", value: "stayarm")
 }
 
 def disarm() {
-	log.debug "Executing 'disarm'"
     parent.switchUpdate("disarm")
-
-//sendEvent (name: "switch", value: "disarm")
 }

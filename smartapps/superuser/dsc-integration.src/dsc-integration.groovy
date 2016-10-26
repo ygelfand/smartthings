@@ -25,9 +25,10 @@ preferences {
     //Get Alarm Code
     input("alarmCodePanel", "text", title: "Alarm Code", description: "The code for your alarm panel.", required: true)
     //Allow user to turn off the Smart Monitor Integration if they arn't using it or use it for another purpose
-    input "smartMonitorInt", "enum", title: "Integrate w/ Smart Monitor?", options: ["Yes", "No"], required: true
+  	input name: "smartMonitorInt", title: "Integrate w/ Smart Monitor?", type: "bool", defaultValue: "true", required: true, submitOnChange: false
+  	input name: "stayIsInstant", title: "Make Stay Arm Instant arm?", type: "bool", defaultValue: "false", required: true, submitOnChange: false
+  	input name: "pushNotify", title: "Send Push Notification?", type: "bool", defaultValue: "false", required: true, submitOnChange: false
   }
-
 }
 
 mappings {
@@ -53,7 +54,7 @@ def updated() {
   initialize()
 }
 def initialize() {
-    if(smartMonitorInt.value[0] != "N")
+    if(smartMonitorInt)
     {
         subscribe(location, "alarmSystemStatus", alarmStatusUpdate)
     }
@@ -64,9 +65,6 @@ def initialize() {
 def installzones() {
   def children = getChildDevices()
   def zones = request.JSON
-
-
-  log.debug "children are ${children}"
   for (zone in zones) {
     def id = zone.key
     def device = 'DSC Zone'
@@ -119,15 +117,12 @@ def installzones() {
 def installpartitions() {
   def children = getChildDevices()
   def partitions = request.JSON
-
-  log.debug "children are ${children}"
   for (part in partitions) {
     def id = part.key
     def name = part.value
     def networkId = "dscpanel${id}"
     def partDevice = children.find { item -> item.device.deviceNetworkId == networkId }
     def device = "DSC Command Center"
-
     if (partDevice == null) {
       log.debug "add new child: device: ${device} networkId: ${networkId} name: ${name}"
       partDevice = addChildDevice('dsc', "${device}", networkId, null, [name: "${name}", label:"${name}", completedSetup: true])
@@ -149,7 +144,6 @@ def installpartitions() {
         }
       }
   }
-
 }
 
 
@@ -191,19 +185,14 @@ private update() {
     {
       // Lookup our eventCode in our eventMap
       def opts = eventMap."${eventCode}"?.tokenize()
-      // log.debug "Options after lookup: ${opts}"
-      // log.debug "Zone or partition: $zoneorpartition"
       if (opts && opts[0])
       {
         // We have some stuff to send to the device now
         // this looks something like panel.zone("open", "1")
-        // log.debug "Test: ${opts[0]} and: ${opts[1]} for $zoneorpartition"
         if ("${opts[0]}" == 'zone') {
-           //log.debug "It was a zone...  ${opts[1]}"
            updateZoneDevices("$zoneorpartition","${opts[1]}")
         }
         if ("${opts[0]}" == 'partition') {
-           //log.debug "It was a zone...  ${opts[1]}"
            updatePartitions( "$zoneorpartition","${opts[1]}")
         }
       }
@@ -212,16 +201,8 @@ private update() {
 
 private updateZoneDevices(zonenum,zonestatus) {
   def children = getChildDevices()
-  log.debug "zonedevices: ${zonenum} is ${zonestatus}"
-  // log.debug "zonedevices.id are $zonedevices.id"
-  // log.debug "zonedevices.displayName are $zonedevices.displayName"
-  // log.debug "zonedevices.deviceNetworkId are $zonedevices.deviceNetworkId"
-  log.debug "Looking for dsczone${zonenum}"
   def zonedevice = children.find { it.deviceNetworkId == "dsczone${zonenum}" }
-  log.debug "Found ${zonedevice} device"
   if (zonedevice) {
-      log.debug "Was True... Zone Device: $zonedevice.displayName at $zonedevice.deviceNetworkId is ${zonestatus}"
-      //Was True... Zone Device: Front Door Sensor at zone1 is closed
       zonedevice.zone("${zonestatus}")
     }
 }
@@ -233,7 +214,6 @@ private updatePartitions( partitionnum, partitionstatus) {
 
   if (paneldevice) {
     log.debug "Was True... Panel device: $paneldevice.displayName at $paneldevice.deviceNetworkId is ${partitionstatus}"
-    //Was True... Zone Device: Front Door Sensor at zone1 is closed
     paneldevice.partition("${partitionstatus}", "${partitionnum}")
   }
 }
@@ -300,18 +280,15 @@ getChildDevices().each {
     {
     	if(it.currentSwitch != command) {
          log.debug "Set Command Switch to $command"
-         it."$command"()       
+         //it."$command"()       
         }
-
-        
      }
    }
 }
 
 private setSmartHomeMonitor(status)
 {
-    //Let's make sure the user turned on Smart Home Monitor Integration and the value I'm trying to set it to isn't already set
-    if(smartMonitorInt.value[0] != "N" && location.currentState("alarmSystemStatus").value != status)
+    if(smartMonitorInt && location.currentState("alarmSystemStatus").value != status)
     {
         log.debug "Set Smart Home Monitor to $status"
         sendLocationEvent(name: "alarmSystemStatus", value: status)
