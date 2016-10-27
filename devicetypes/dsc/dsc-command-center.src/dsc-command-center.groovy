@@ -38,6 +38,7 @@ metadata {
 				attributeState "disarm", label:'Disarmed - Ready', icon:"st.security.alarm.off", backgroundColor:"#79b821"
 				attributeState "arm", label:'Armed - Away', icon:"st.security.alarm.on", backgroundColor:"#800000"
 				attributeState "stayarm", label:'Armed - Stay', icon:"st.security.alarm.on", backgroundColor:"#008CC1"
+                attributeState "instantaway", label:'Armed - Stay', icon:"st.security.alarm.on", backgroundColor:"#008CC1"
 				attributeState "armed",     label: 'Armed',      backgroundColor: "#800000", icon:"st.Home.home3"
                 attributeState "exitdelay", label: 'Exit Delay', backgroundColor: "#ff9900", icon:"st.Home.home3"
       			attributeState "entrydelay",label: 'EntryDelay', backgroundColor: "#ff9900", icon:"st.Home.home3"
@@ -77,6 +78,7 @@ def partition(String state, String partition) {
 
     log.debug "Partition: ${state} for partition: ${partition}"
     sendEvent (name: "switch", value: "${state}")
+  	parent.switchUpdate($state)
 }
 
 // handle commands
