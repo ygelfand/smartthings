@@ -172,7 +172,9 @@ private update() {
       '654':"partition alarm",
       '656':"partition exitdelay",
       '657':"partition entrydelay",
-      '666':"partition stayarm",
+      '666':"partition instantaway",
+      '667':"partition instantstay",
+      '668':"partition stayarm",
       '701':"partition armed",
       '702':"partition armed",
 
@@ -227,13 +229,16 @@ private sendMessage(msg) {
         sendPush(newMsg)
     }
 }
+def lanResponseHandler(evt) {
+  log.debug evt
+  }
 
 def switchUpdate(evt) {
-    def securityMonitorMap = [
-        'stay':"stayarm",
-        'off':"disarm",
-        'away':"arm"
-    ]
+  def securityMonitorMap = [
+       'stayarm':"stay",
+       'disarm':"off",
+       'arm':"away"
+   ]
 	setSmartHomeMonitor(securityMonitorMap."${evt}")
 }
 
@@ -243,7 +248,9 @@ def alarmStatusUpdate(evt) {
     def eventMap = [
         'stay':"/api/alarm/stayarm",
         'off':"/api/alarm/disarm",
-        'away':"/api/alarm/armwithcode"
+        'away':"/api/alarm/armwithcode",
+        'instant':"/api/alarm/instantarm",
+
     ]
 
     def securityMonitorMap = [
@@ -255,6 +262,10 @@ def alarmStatusUpdate(evt) {
     def command = securityMonitorMap."${evt.value}";
     setCommandSwitch(command)
     def path = eventMap."${evt.value}"
+    if(stayIsInstant && evt.value == 'stay')
+    {
+     path = eventMap.'instant'
+    }
     callAlarmServer(path)
 }
 
