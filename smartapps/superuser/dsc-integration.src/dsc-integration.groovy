@@ -177,13 +177,9 @@ private update() {
       '668':"partition stayarm",
       '701':"partition armed",
       '702':"partition armed",
-      "800":"notify badbattery",
-      "801":"notify goodbattery",
-      "802":"notify powerloss",
-      "803":"notify powerrestored",
-      '840':"notify trouble",
-      '841':"notify notrouble",
      ]
+     
+
     // get our passed in eventcode
     def eventCode = params.eventcode
     if (eventCode)
@@ -202,8 +198,11 @@ private update() {
    
            updatePartitions( "$zoneorpartition","${opts[1]}")
         }
-       if (("${opts[0]}" == 'partition') && pushNotify) {
-       def pushMessages = [
+      }
+    }
+    if (pushNotify) {
+    def pushMessages = [
+                        '654':"Alarm Activated",
                         "800":"Bad battery detected on alarm system",
      					"801":"Alarm battery restored",
      					"802":"Alarm has lost power",
@@ -211,21 +210,26 @@ private update() {
       					'840':"Alarm violation triggered",
       					'841':"Alarm violation cleared",
        	]
-        msg = pushMessages."${eventCode}"
+        def msg = pushMessages."${eventCode}"
         if(msg)
         {
         	sendPush(msg)
         }
-		}
-      }
-    }
+     }
 }
 
 private updateZoneDevices(zonenum,zonestatus) {
   def children = getChildDevices()
   def zonedevice = children.find { it.deviceNetworkId == "dsczone${zonenum}" }
   if (zonedevice) {
+      if(zonedevice.latestValue("contact") != zonestatus) {
+         def paneldevice = children.find { it.deviceNetworkId == "dscpanel1" }
+	     if(paneldevice) {           
+      	    paneldevice.sendEvent(name: "zonestate", isStateChange: true, value: zonestatus, descriptionText: "is ${zonestatus}" , linkText: zonedevice.name )
+         }
+      }
       zonedevice.zone("${zonestatus}")
+
     }
 }
 
