@@ -177,10 +177,13 @@ private update() {
       '668':"partition stayarm",
       '701':"partition armed",
       '702':"partition armed",
-
-
-    ]
-
+      "800":"notify badbattery",
+      "801":"notify goodbattery",
+      "802":"notify powerloss",
+      "803":"notify powerrestored",
+      '840':"notify trouble",
+      '841':"notify notrouble",
+     ]
     // get our passed in eventcode
     def eventCode = params.eventcode
     if (eventCode)
@@ -195,8 +198,25 @@ private update() {
            updateZoneDevices("$zoneorpartition","${opts[1]}")
         }
         if ("${opts[0]}" == 'partition') {
+
+   
            updatePartitions( "$zoneorpartition","${opts[1]}")
         }
+       if (("${opts[0]}" == 'partition') && pushNotify) {
+       def pushMessages = [
+                        "800":"Bad battery detected on alarm system",
+     					"801":"Alarm battery restored",
+     					"802":"Alarm has lost power",
+      					"803":"Alarm power restored",
+      					'840':"Alarm violation triggered",
+      					'841':"Alarm violation cleared",
+       	]
+        msg = pushMessages."${eventCode}"
+        if(msg)
+        {
+        	sendPush(msg)
+        }
+		}
       }
     }
 }
@@ -236,10 +256,15 @@ def lanResponseHandler(evt) {
 def switchUpdate(evt) {
   def securityMonitorMap = [
        'stayarm':"stay",
+       'instantstay': 'stay',
+       'instantaway': 'stay',
        'disarm':"off",
        'arm':"away"
    ]
-	setSmartHomeMonitor(securityMonitorMap."${evt}")
+   def action = securityMonitorMap."${evt}"
+   if(action) {
+	setSmartHomeMonitor(action)
+    }
 }
 
 //When a button is pressed in Smart Home Monitor, this will capture the event and send that to Alarm Server
