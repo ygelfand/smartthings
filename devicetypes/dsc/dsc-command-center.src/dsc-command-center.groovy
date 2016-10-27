@@ -23,6 +23,7 @@ metadata {
 		command "stayarm"
 		command "arm"
 		command "disarm"
+        attribute "zonestate", "string"
 		}
 
 	// simulator metadata
@@ -31,9 +32,13 @@ metadata {
 
 	// UI tile definitions
 	tiles(scale: 2) {
-    
-
-		multiAttributeTile(name:"status", type: "generic", width: 6, height: 4){
+    standardTile("zonestate", "device.zonestate", width: 2, height: 2, canChangeBackground: true, canChangeIcon: true) {
+      state "open",   label: '${name}', icon: "st.contact.contact.open",   backgroundColor: "#ffa81e"
+      state "closed", label: '${name}', icon: "st.contact.contact.closed", backgroundColor: "#79b821"
+      state "alarm",  label: '${name}', icon: "st.contact.contact.open",   backgroundColor: "#ff0000"
+      state "bypass",  label: '${name}', icon: "st.contact.contact.open",   backgroundColor: "#c88ad1"
+    }
+		multiAttributeTile(name:"status", type: "generic", width: 6, height: 2){
      	   tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
 				attributeState "disarm", label:'Disarmed - Ready', icon:"st.security.alarm.off", backgroundColor:"#79b821"
 				attributeState "arm", label:'Armed - Away', icon:"st.security.alarm.on", backgroundColor:"#800000"
@@ -56,11 +61,11 @@ metadata {
 			state "arm", label: 'Arm', action: "arm", icon: "st.Home.home4", backgroundColor: "#800000"
        }
 		standardTile("stayarm", "capability.momentary", width: 2, height: 2, title: "Armed Stay", required: true, multiple: false){
-			state "stayarm", label: 'Arm - Stay', action: "stayarm", icon: "st.Home.home4", backgroundColor: "#008CC1"
+			state "stayarm", label: 'Stay', action: "stayarm", icon: "st.Home.home4", backgroundColor: "#008CC1"
        }
 
-		main (["status", "arm", "stayarm", "staybutton", "disarm"])	
-		details(["status", "arm", "stayarm", "staybutton", "disarm"])	
+		main (["status"])	
+        details(['status', 'arm', 'stayarm', 'disarm'])
 
 	}
 }
