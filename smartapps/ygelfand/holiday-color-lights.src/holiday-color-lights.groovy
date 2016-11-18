@@ -19,38 +19,59 @@ definition(
     author: "ygelfand",
     description: "This SmartApp will change the color of selected lights based on closest holiday colors",
     category: "Convenience",
-    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
-    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
-    iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png")
+    iconUrl: "https://lh5.ggpht.com/xJkWtYJeUMcCz2oCc3XbN1c5xbNY87RXj3FD3yUx0k1eQ71e16WJPlq6b404Sk1qIw=w60",
+    iconX2Url: "https://lh5.ggpht.com/xJkWtYJeUMcCz2oCc3XbN1c5xbNY87RXj3FD3yUx0k1eQ71e16WJPlq6b404Sk1qIw=w120",
+    iconX3Url: "https://lh5.ggpht.com/xJkWtYJeUMcCz2oCc3XbN1c5xbNY87RXj3FD3yUx0k1eQ71e16WJPlq6b404Sk1qIw=w180")
 
 
 preferences {
     page(name: "configurationPage")
     }
+    
 def configurationPage() {
-dynamicPage(name: "configurationPage", title: "Holidays setup",uninstall: true, install: true) {
-		section("HolidaySchedule") {
-            input name: "sunset",type: "bool", title: "Start at sunset?", required: true, defaultValue: true, submitOnChange: true
-        if(sunset == false) {
-            input "starttime", "time", title: "Start Time", required: true
-        }
-            input "sunrise","bool", title: "End at sunrise?", required: true, defaultValue: true, submitOnChange: true
-        if(sunrise == false) {
-			input "endtime", "time", title: "End Time", required: true
-        }
-        	input "days", "enum", title: "Day of the week (none for all)", required: false, multiple: true, options: ["Sunday":"Sunday", "Monday": "Monday", "Tuesday": "Tuesday", "Wednesday": "Wednesday", "Thursday": "Thursday", "Friday": "Friday", "Saturday":"Saturday"]
-		}
- 
-	section("Light Settings") {
+	dynamicPage(name: "configurationPage", title: "Holidays setup",uninstall: true, install: true) {
+		section("Lights Schedule") {
+            input "startTimeType", "enum", title: "Starting at", options: [["time": "A specific time"], ["sunrise": "Sunrise"], ["sunset": "Sunset"]], defaultValue: "time", submitOnChange: true
+            if (startTimeType in ["sunrise","sunset"]) {
+                input "startTimeOffset", "number", title: "Offset in minutes (+/-)", range: "*..*", required: false
+            }
+            else {
+                input "starting", "time", title: "Start time", required: false
+            }
+            input "endTimeType", "enum", title: "Ending at", options: [["time": "A specific time"], ["sunrise": "Sunrise"], ["sunset": "Sunset"]], defaultValue: "time", submitOnChange: true
+            if (endTimeType in ["sunrise","sunset"]) {
+                input "endTimeOffset", "number", title: "Offset in minutes (+/-)", range: "*..*", required: false
+            }
+            else {
+                input "ending", "time", title: "End time", required: false
+            }
+      		input "days", "enum", title: "Day of the week", required: true, multiple: true, options: [
+            	"Sunday",
+				"Monday",
+				"Tuesday",
+				"Wednesday",
+				"Thursday",
+				"Friday",
+				"Saturday"
+            	], defaultValue:  [
+            	"Sunday",
+				"Monday",
+				"Tuesday",
+				"Wednesday",
+				"Thursday",
+				"Friday",
+				"Saturday" ] 
+ 		}
+		section("Light Settings") {
             input "lights", "capability.colorControl", title: "Which Color Changing Bulbs?", multiple:true, required: true
-        	input "brightnessLevel", "number", title: "Brightness Level (1-100)?", required:false, defaultValue:100
-	}
-	section("Holidays Settings") {
-		input "holidays", "enum", title: "Holidays?", required: true, multiple: true, options: holidayNames(), defaultValue: holidayNames()
-        input "maxdays", "number", title: "Maximum number of days around a holiday? (-1 for unlimited)", required: true, defaultValue: -1
-        input "forceholiday", "enum", title: "Force a specific holiday?", required: false, multiple: false, options: holidayNames()
-	}
-section("Frequency") {
+        	input "brightnessLevel", "number", title: "Brightness Level (1-100)?", required:false, defaultValue:100, range: '1..100'
+		}
+		section("Holidays Settings") {
+			input "holidays", "enum", title: "Holidays?", required: true, multiple: true, options: holidayNames(), defaultValue: holidayNames()
+        	input "maxdays", "number", title: "Maximum number of days around a holiday? (-1 for unlimited)", range: '-1..60', required: true, defaultValue: -1
+        	input "forceholiday", "enum", title: "Force a specific holiday?", required: false, multiple: false, options: holidayNames()
+		}
+		section("Frequency") {
             input "cycletime", "enum", title: "Cycle frequency?" , options: [
 				[1:"1 minute"],
                 [5:"5 minutes"],
@@ -60,22 +81,19 @@ section("Frequency") {
 				[60:"1 hour"],
 				[180:"3 hours"],
 			], required: true, defaultValue: "10"
-	input "seperate", "enum", title: "Cycle each light individually, or all together?", required: true, multiple: false, defaultValue: "individual", options: [
+			input "seperate", "enum", title: "Cycle each light individually, or all together?", required: true, multiple: false, defaultValue: "individual", options: [
 				[individual:"Individual"],
 				[combined:"Combined"],
 			]
-    input "holidayalgo", "enum", title: "Color selection", required: true, multiple: false, defaultValue: "closest", submitOnChange: true, options: [
-    		[closest:"Closest Holiday"],
-            [closestwgo:"Next Holiday (with linger)"]
-    	]
-        if(holidayalgo == "closestwgo") {
-            input "lingerdays", "number", title: "Days to linger after the holiday", required: true, defaultValue: 0
-        }
-    
-
+    		input "holidayalgo", "enum", title: "Color selection", required: true, multiple: false, defaultValue: "closest", submitOnChange: true, options: [
+    			[closest:"Closest Holiday"],
+            	[closestwgo:"Next Holiday (with linger)"]
+    		]
+        	if(holidayalgo == "closestwgo") {
+            	input "lingerdays", "number", title: "Days to linger after the holiday", required: true, defaultValue: 0
+        	}
+		}
 	}
-
-}
 }
 def allHolidayList() {
     return [
@@ -116,6 +134,69 @@ def holidayTimestamps()  {
         timestamps[Date.parse("${it.day}/${next_year} 23:59:59")] = it.name
     }
     return timestamps.sort()
+}
+
+private timeWindowStart() {
+    def result = null
+    if (startTimeType == "sunrise") {
+        result = location.currentState("sunriseTime")?.dateValue
+        if (result && startTimeOffset) {
+            result = new Date(result.time + Math.round(startTimeOffset * 60000))
+        }
+    }
+    else if (startTimeType == "sunset") {
+        result = location.currentState("sunsetTime")?.dateValue
+        if (result && startTimeOffset) {
+            result = new Date(result.time + Math.round(startTimeOffset * 60000))
+        }
+    }
+    else if (starting && location.timeZone) {
+        result = timeToday(starting, location.timeZone)
+    }
+    log.trace "timeWindowStart = ${result}"
+    result
+}
+
+private getTimeOk() {
+    def result = true
+    def start = timeWindowStart()
+    def stop = timeWindowStop()
+    if (start && stop && location.timeZone) {
+        result = timeOfDayIsBetween(start, stop, new Date(), location.timeZone)
+    }
+    log.trace "timeOk = $result"
+    result
+}
+private getDaysOk() {
+	def df = new java.text.SimpleDateFormat("EEEE")
+	if (location.timeZone) {
+		df.setTimeZone(location.timeZone)
+	}
+	else {
+		df.setTimeZone(TimeZone.getTimeZone("America/New_York"))
+	}
+	def day = df.format(new Date())
+	days.contains(day)
+}
+private timeWindowStop() {
+    def result = null
+    if (endTimeType == "sunrise") {
+        result = location.currentState("sunriseTime")?.dateValue
+        if (result && endTimeOffset) {
+            result = new Date(result.time + Math.round(endTimeOffset * 60000))
+        }
+    }
+    else if (endTimeType == "sunset") {
+        result = location.currentState("sunsetTime")?.dateValue
+        if (result && endTimeOffset) {
+            result = new Date(result.time + Math.round(endTimeOffset * 60000))
+        }
+    }
+    else if (ending && location.timeZone) {
+        result = timeToday(ending, location.timeZone)
+    }
+    log.trace "timeWindowStop = ${result}"
+    result
 }
 def closestWithoutGO(buffer=0) {
     def today = new Date()
@@ -166,12 +247,20 @@ def updated() {
 }
 
 def initialize() {
-	schedule("0 0/${settings.cycletime} * 1/1 * ? *",changeHandler)
+	def hours = settings.cycletime.intdiv(60)
+    def minutes = settings.cycletime % 60
+    def hourmark
+    if(hours > 0)
+    	hourmark = "${hours}"
+    else
+    	hourmark = "*"
+	schedule("0 0/${minutes} ${hourmark} 1/1 * ? *",changeHandler)
     state.colorOffset=0
 }
 
 def changeHandler(evt) {
-        
+	if(!getTimeOk() || !getDaysOk()) 
+		return true
     if (lights)
     {
     	def colors = []
@@ -199,7 +288,7 @@ def changeHandler(evt) {
 		def onLights = lights.findAll { light -> light.currentSwitch == "on"}
         def numberon = onLights.size();
         def numcolors = colors.size();
-        log.debug "Offset: ${state.colorOffset}"
+        //log.debug "Offset: ${state.colorOffset}"
     	if (onLights.size() > 0) {
         	if (state.colorOffset >= numcolors ) {
             	state.colorOffset = 0
