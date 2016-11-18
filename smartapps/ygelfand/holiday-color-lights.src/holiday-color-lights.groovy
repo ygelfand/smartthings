@@ -31,6 +31,7 @@ preferences {
 def configurationPage() {
 	dynamicPage(name: "configurationPage", title: "Holidays setup",uninstall: true, install: true) {
 		section("Lights Schedule") {
+        	input "globalEnable", "bool", title: "Enabled?", defaultValue: true, required: true
             input "startTimeType", "enum", title: "Starting at", options: [["time": "A specific time"], ["sunrise": "Sunrise"], ["sunset": "Sunset"]], defaultValue: "time", submitOnChange: true
             if (startTimeType in ["sunrise","sunset"]) {
                 input "startTimeOffset", "number", title: "Offset in minutes (+/-)", range: "*..*", required: false
@@ -80,7 +81,7 @@ def configurationPage() {
 				[30:"30 minutes"],
 				[60:"1 hour"],
 				[180:"3 hours"],
-			], required: true, defaultValue: "10"
+			], required: true, defaultValue: "10", multiple: false
 			input "seperate", "enum", title: "Cycle each light individually, or all together?", required: true, multiple: false, defaultValue: "individual", options: [
 				[individual:"Individual"],
 				[combined:"Combined"],
@@ -247,8 +248,8 @@ def updated() {
 }
 
 def initialize() {
-	def hours = settings.cycletime.intdiv(60)
-    def minutes = settings.cycletime % 60
+	def hours = settings.cycletime.toInteger().intdiv(60)
+    def minutes = settings.cycletime.toInteger() % 60
     def hourmark
     if(hours > 0)
     	hourmark = "${hours}"
@@ -259,7 +260,7 @@ def initialize() {
 }
 
 def changeHandler(evt) {
-	if(!getTimeOk() || !getDaysOk()) 
+	if(!globalEnable || !getTimeOk() || !getDaysOk() ) 
 		return true
     if (lights)
     {
