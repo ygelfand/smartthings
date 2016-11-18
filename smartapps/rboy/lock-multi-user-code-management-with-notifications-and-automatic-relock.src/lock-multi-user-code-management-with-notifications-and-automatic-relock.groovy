@@ -257,7 +257,7 @@ def usersPage() {
             input name: "disableAllNotify", title: "Disable all push notifications", type: "bool", defaultValue: "false", required: true
             input name: "enableVoiceNotify", title: "Enable Voicenotifications", type: "bool", defaultValue: "false", required: true, submitOnChange: true
 			if(enableVoiceNotify) {
-            	input "Speakers","capability.musicPlayer", title: "Lock", multiple: true, requred: true
+            	input "Speakers","capability.musicPlayer", title: "Speaker", multiple: true, requred: true
                 input "SpeakerVolume", "number", title: "Set volume to (1-100%):", required: false
 			}
         }

@@ -28,6 +28,11 @@ preferences {
   	input name: "smartMonitorInt", title: "Integrate w/ Smart Monitor?", type: "bool", defaultValue: "true", required: true, submitOnChange: false
   	input name: "stayIsInstant", title: "Make Stay Arm Instant arm?", type: "bool", defaultValue: "false", required: true, submitOnChange: false
   	input name: "pushNotify", title: "Send Push Notification?", type: "bool", defaultValue: "false", required: true, submitOnChange: false
+	input name: "enableVoiceNotify", title: "Enable Voice Notifications", type: "bool", defaultValue: "false", required: true, submitOnChange: true
+
+        input "Speakers","capability.musicPlayer", title: "Speaker", multiple: true, requred: false
+        input "SpeakerVolume", "number", title: "Set volume to (1-100%):", required: false
+
   }
 }
 
@@ -263,12 +268,26 @@ def switchUpdate(evt) {
        'instantstay': 'stay',
        'instantaway': 'stay',
        'disarm':"off",
-       'arm':"away"
+       'arm':"away",
+       'armed':"away"
    ]
+   def voiceMap = [
+   	'exitdelay' : "Arming Alarm. Exit delay in progress",
+    'disarm' : "Alarm Disarmed",
+    'armed' : 'Alarm Armed in Away mode',
+    'stayarm' : 'Alarm Armed in Stay mode',
+    'instantstay': 'Alarm Armed in Instant mode',
+  
+   ]
+   
    def action = securityMonitorMap."${evt}"
    if(action) {
 	setSmartHomeMonitor(action)
     }
+   def voiceaction = voiceMap."${evt}"
+   if(voiceaction) {
+   		voiceNotify(voiceaction)
+   }
 }
 
 //When a button is pressed in Smart Home Monitor, this will capture the event and send that to Alarm Server
@@ -324,6 +343,18 @@ getChildDevices().each {
         }
      }
    }
+}
+
+def voiceNotify(phrase) {
+	if(enableVoiceNotify) {
+		Speakers.each(){
+			if(SpeakerVolume)
+			{
+				it.setVolume(SpeakerVolume);
+			}
+    		it.speak(phrase)
+    	}
+	}
 }
 
 private setSmartHomeMonitor(status)
