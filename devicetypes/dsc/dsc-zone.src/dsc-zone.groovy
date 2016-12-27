@@ -11,6 +11,9 @@ metadata {
     // Change or define capabilities here as needed
     capability "Refresh"
     capability "Contact Sensor"
+    capability "Motion Sensor"
+    capability "Sensor"
+    capability "Momentary"
     capability "Polling"
 
     // Add commands as needed

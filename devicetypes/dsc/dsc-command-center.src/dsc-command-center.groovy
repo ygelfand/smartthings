@@ -18,11 +18,14 @@
 metadata {
 	definition (name: "DSC Command Center", author: "me", namespace: "dsc") {
 		capability "Switch"
+        capability "Lock"
+
 		capability "polling"
 		
 		command "stayarm"
 		command "arm"
 		command "disarm"
+        command "unlock"
         attribute "zonestate", "string"
 		}
 
@@ -43,7 +46,8 @@ metadata {
 				attributeState "disarm", label:'Disarmed - Ready', icon:"st.security.alarm.off", backgroundColor:"#79b821"
 				attributeState "arm", label:'Armed - Away', icon:"st.security.alarm.on", backgroundColor:"#800000"
 				attributeState "stayarm", label:'Armed - Stay', icon:"st.security.alarm.on", backgroundColor:"#008CC1"
-                attributeState "instantaway", label:'Armed - Stay', icon:"st.security.alarm.on", backgroundColor:"#008CC1"
+                attributeState "instantaway", label:'Armed - Away (instant)', icon:"st.security.alarm.on", backgroundColor:"#800000"
+                attributeState "instantstay", label:'Armed - Stay (instant)', icon:"st.security.alarm.on", backgroundColor:"#008CC1"
 				attributeState "armed",     label: 'Armed',      backgroundColor: "#800000", icon:"st.Home.home3"
                 attributeState "exitdelay", label: 'Exit Delay', backgroundColor: "#ff9900", icon:"st.Home.home3"
       			attributeState "entrydelay",label: 'EntryDelay', backgroundColor: "#ff9900", icon:"st.Home.home3"
@@ -83,18 +87,24 @@ def partition(String state, String partition) {
 
     log.debug "Partition: ${state} for partition: ${partition}"
     sendEvent (name: "switch", value: "${state}")
-  	parent.switchUpdate($state)
+  	parent.switchUpdate("${state}")
 }
 
 // handle commands
 def arm() {
     parent.switchUpdate("arm")
+    parent.alarmStatusUpdate("away")
 }
 
 def stayarm() {
     parent.switchUpdate("stayarm")
+    parent.alarmStatusUpdate("stay")
 }
 
 def disarm() {
     parent.switchUpdate("disarm")
+    parent.alarmStatusUpdate("off")
+}
+def unlock() {
+	disarm()
 }

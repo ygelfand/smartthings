@@ -169,7 +169,7 @@ def updated() {
 }
 
 def parse(String description) {
-//    log.debug "Parse received ${description}"
+    log.debug "Parse received ${description}"
     def result = null
     def cmd = zwave.parse(description, [0x31: 1, 0x32: 1, 0x60: 3, 0x80: 1])
     if (cmd) {
@@ -386,7 +386,7 @@ def configure() {
     def cmd = delayBetween([
 
  	// Performs a complete factory reset.  Use this all by itself and comment out all others below.  Once reset, comment this line out and uncomment the others to go back to normal
-//  zwave.configurationV1.configurationSet(parameterNumber: 255, size: 4, scaledConfigurationValue: 1).format()
+// zwave.configurationV1.configurationSet(parameterNumber: 255, size: 4, scaledConfigurationValue: 1).format(),
 
     // Send data based on a time interval (0), or based on a change in wattage (1).  0 is default and enables parameters 111, 112, and 113. 1 enables parameters 4 and 8.
     zwave.configurationV1.configurationSet(parameterNumber: 3, size: 1, scaledConfigurationValue: reportType).format(),
@@ -398,13 +398,13 @@ def configure() {
     zwave.configurationV1.configurationSet(parameterNumber: 8, size: 1, scaledConfigurationValue: wattsPercent).format(),
 
 	// Defines the type of report sent for Reporting Group 1 for the whole device.  1->Battery Report, 4->Meter Report for Watt, 8->Meter Report for kWh
-    zwave.configurationV1.configurationSet(parameterNumber: 101, size: 4, scaledConfigurationValue: 4).format(), //watts
+    zwave.configurationV1.configurationSet(parameterNumber: 101, size: 4, scaledConfigurationValue: 2).format(), //watts
 
     // If parameter 3 is 0, report every XX Seconds (for Watts) for Reporting Group 1 for the whole device.
 	zwave.configurationV1.configurationSet(parameterNumber: 111, size: 4, scaledConfigurationValue: secondsWatts).format(),
 
     // Defines the type of report sent for Reporting Group 2 for the whole device.  1->Battery Report, 4->Meter Report for Watt, 8->Meter Report for kWh
-    zwave.configurationV1.configurationSet(parameterNumber: 102, size: 4, scaledConfigurationValue: 8).format(), //kWh
+    zwave.configurationV1.configurationSet(parameterNumber: 102, size: 4, scaledConfigurationValue: 1).format(), //kWh
 
     // If parameter 3 is 0, report every XX seconds (for kWh) for Reporting Group 2 for the whole device.
 	zwave.configurationV1.configurationSet(parameterNumber: 112, size: 4, scaledConfigurationValue: secondsKwh).format(),
@@ -416,6 +416,6 @@ def configure() {
     zwave.configurationV1.configurationSet(parameterNumber: 113, size: 4, scaledConfigurationValue: secondsBattery).format()
         
     ])
-
+	log.debug cmd
     cmd
 }
