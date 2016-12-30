@@ -100,17 +100,17 @@ def allHolidayList() {
     return [
     [name: "New Years Day", day: '01/01', colors: ['White', 'Red', 'Pink', 'Purple'] ],
     [name: "Valentine's Day", day: '02/14', colors: ["Red", "Pink", "Rasberry", "Purple", "Indigo"] ],
-    [name: "Presidents Day", day: '02/16', colors: ["Red", "White", "Blue" ] ],
+    [name: "Presidents Day", day: '02/20', colors: ["Red", "White", "Blue" ] ],
     [name: "St. Patrick's Day", day: '03/17', colors: ["Green", "Orange"] ],
     [name: "Easter", day: '04/16', colors: [ 'Pink', 'Turquoise', 'Aqua' ] ],
-    [name: "Mothers Day", day: '05/10', colors: ['Red', 'Pink'] ],
-    [name: "Memorial Day", day: '05/25', colors: ["Red", "White", "Blue" ] ],
-    [name: "Fathers Day", day: '06/21', , colors: ["Blue", "Navy Blue"] ],
+    [name: "Mothers Day", day: '05/14', colors: ['Red', 'Pink'] ],
+    [name: "Memorial Day", day: '05/29', colors: ["Red", "White", "Blue" ] ],
+    [name: "Fathers Day", day: '06/18', , colors: ["Blue", "Navy Blue"] ],
     [name: "Independence Day", day: '07/04', colors: ["Red", "White", "Blue" ] ],
-    [name: "Labor Day", day: '09/07', colors: ["Red", "White", "Blue" ] ],
+    [name: "Labor Day", day: '09/04', colors: ["Red", "White", "Blue" ] ],
     [name: "Halloween", day: '10/31', colors: ['Orange', 'Safety Orange' ] ],
     [name: "Veterans Day", day: '11/11', colors: ["Red", "White", "Blue" ] ],
-    [name: "Thanksgiving", day: '11/26', colors: ['Orange', 'Safety Orange' ] ],
+    [name: "Thanksgiving", day: '11/23', colors: ['Orange', 'Safety Orange' ] ],
     [name: "Christmas Day", day: '12/25', colors: ["Red", "Green"] ]
 	]
 
@@ -345,3 +345,4 @@ log.debug "In send color"
     log.debug "Setting Color = ${color} for: ${lights}"
 
 }
+
