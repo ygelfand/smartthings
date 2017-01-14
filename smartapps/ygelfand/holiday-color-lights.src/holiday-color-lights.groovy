@@ -99,6 +99,7 @@ def configurationPage() {
 def allHolidayList() {
     return [
     [name: "New Years Day", day: '01/01', colors: ['White', 'Red', 'Pink', 'Purple'] ],
+    [name: "Law Enforcement Day", day: '01/09', colors: ['Blue', "Navy Blue"] ],
     [name: "Valentine's Day", day: '02/14', colors: ["Red", "Pink", "Rasberry", "Purple", "Indigo"] ],
     [name: "Presidents Day", day: '02/20', colors: ["Red", "White", "Blue" ] ],
     [name: "St. Patrick's Day", day: '03/17', colors: ["Green", "Orange"] ],
@@ -345,4 +346,5 @@ log.debug "In send color"
     log.debug "Setting Color = ${color} for: ${lights}"
 
 }
+
 
