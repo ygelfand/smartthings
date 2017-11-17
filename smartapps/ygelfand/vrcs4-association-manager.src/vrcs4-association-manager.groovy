@@ -26,24 +26,17 @@ def selectButtons() {
 			input "buttonDevice", "capability.button", title: "Controller", multiple: false, required: true
 		}
     (1..4).each {
-        getButtonSections(it)
+		    section(title: "Button ${it} will toggle") {
+			    input "switches_${it}", "capability.switch", title: "Switches:", multiple: true, required: false
+		    }
+        section(title: "Button ${it} LED Status Color when on:") {
+    	    input "color_${it}", "enum", title: "Choose LED Color.", required: false, default: 1, multiple: false, options: [1: 'Green', 17: 'Orange']
+        }
       }
    section {
         	label(title: "Label this SmartApp", required: false, defaultValue: "VRCS4 Associator")
    }  
 
-	}
-}
-
-// Configure each button actions
-def getButtonSections(buttonNumber) {
-	return {
-		section(title: "Button ${buttonNumber} will toggle") {
-			input "switches_${buttonNumber}", "capability.switch", title: "Switches:", multiple: true, required: false
-		}
-    section(title: "Button ${buttonNumber} LED Status Color when on:") {
-    	input "color_${buttonNumber}", "enum", title: "Choose LED Color.", required: false, default: 1, multiple: false, options: [1: 'Green', 17: 'Orange']
-    }
 	}
 }
 
