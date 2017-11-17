@@ -26,7 +26,7 @@ def selectButtons() {
 			input "buttonDevice", "capability.button", title: "Controller", multiple: false, required: true
 		}
     (1..4).each {
-        buttonNum = it.clone()
+        buttonNum = it
 		    section(title: "Button ${buttonNum} will toggle") {
 			    input "switches_${buttonNum}", "capability.switch", title: "Switches:", multiple: true, required: false
 		    }
