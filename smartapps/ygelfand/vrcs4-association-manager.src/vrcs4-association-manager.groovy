@@ -26,7 +26,7 @@ def selectButtons() {
 			input "buttonDevice", "capability.button", title: "Controller", multiple: false, required: true
 		}
     (1..4).each {
-        getButtonSection(it)
+        getButtonSections(it)
       }
    section {
         	label(title: "Label this SmartApp", required: false, defaultValue: "VRCS4 Associator")
