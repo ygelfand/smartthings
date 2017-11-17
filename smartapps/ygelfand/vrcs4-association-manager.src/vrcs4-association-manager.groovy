@@ -26,11 +26,12 @@ def selectButtons() {
 			input "buttonDevice", "capability.button", title: "Controller", multiple: false, required: true
 		}
     (1..4).each {
-		    section(title: "Button ${it} will toggle") {
-			    input "switches_${it}", "capability.switch", title: "Switches:", multiple: true, required: false
+        buttonNum = it.clone()
+		    section(title: "Button ${buttonNum} will toggle") {
+			    input "switches_${buttonNum}", "capability.switch", title: "Switches:", multiple: true, required: false
 		    }
-        section(title: "Button ${it} LED Status Color when on:") {
-    	    input "color_${it}", "enum", title: "Choose LED Color.", required: false, default: 1, multiple: false, options: [1: 'Green', 17: 'Orange']
+        section(title: "Button ${buttonNum} LED Status Color when on:") {
+    	    input "color_${buttonNum}", "enum", title: "Choose LED Color.", required: false, default: 1, multiple: false, options: [1: 'Green', 17: 'Orange']
         }
       }
    section {
