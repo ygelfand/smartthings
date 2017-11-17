@@ -12,7 +12,7 @@ definition(
     author: "ygelfand",
     description: "Direct associate light switches/dimmer to buttons on Leviton VRCS4",
     category: "Convenience",
-    iconUrl: "http://s3.amazonaws.com/cesco-content/unilog/Batch3/078477/612780-ProductImageURL.jpg'
+    iconUrl: 'http://s3.amazonaws.com/cesco-content/unilog/Batch3/078477/612780-ProductImageURL.jpg',
     iconX2Url: 'http://s3.amazonaws.com/cesco-content/unilog/Batch3/078477/612780-ProductImageURL.jpg'
 )
 
@@ -38,7 +38,7 @@ def selectButtons() {
 // Configure each button actions
 def getButtonSections(buttonNumber) {
 	return {
-		section(title: "Button ${buttonNumber} will toggle" {
+		section(title: "Button ${buttonNumber} will toggle") {
 			input "switches_${buttonNumber}", "capability.switch", title: "Switches:", multiple: true, required: false
 		}
     section(title: "Button ${buttonNumber} LED Status Color when on:") {
