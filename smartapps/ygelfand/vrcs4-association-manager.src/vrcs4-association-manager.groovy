@@ -7,7 +7,7 @@
  */
 
 definition(
-    name: "Leviton VRCS4 Association Manager",
+    name: "VRCS4 Association Manager",
     namespace: "ygelfand",
     author: "ygelfand",
     description: "Direct associate light switches/dimmer to buttons on Leviton VRCS4",
