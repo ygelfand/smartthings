@@ -21,7 +21,7 @@ preferences {
 }
 
 def selectButtons() {
-	dynamicPage(name: "selectButtons", title: "VRCS4 controller", uninstall: true) {
+	dynamicPage(name: "selectButtons", title: "VRCS4 controller", uninstall: true, install:true) {
 		section {
 			input "buttonDevice", "capability.button", title: "Controller", multiple: false, required: true
 		}
