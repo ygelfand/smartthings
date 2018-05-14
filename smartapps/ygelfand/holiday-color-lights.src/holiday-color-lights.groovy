@@ -63,6 +63,10 @@ def configurationPage() {
 				"Friday",
 				"Saturday" ] 
  		}
+        section("Only When") {
+        	input "toggleSwitch", "capability.switch", title: "Only run when this switch is on", required: false, multiple: false
+            input "modes", "mode", title: "Only when mode is", required: false, multiple: true
+        }
 		section("Light Settings") {
             input "lights", "capability.colorControl", title: "Which Color Changing Bulbs?", multiple:true, required: true
         	input "brightnessLevel", "number", title: "Brightness Level (1-100)?", required:false, defaultValue:100, range: '1..100'
@@ -159,6 +163,13 @@ private timeWindowStart() {
     result
 }
 
+private getSwitchOk(){
+  def  result = !toggleSwitch || (toggleSwitch.currentSwitch == "on")
+}
+private getModeOk() {
+    def result = !modes || modes.contains(location.mode)
+        result
+}
 private getTimeOk() {
     def result = true
     def start = timeWindowStart()
@@ -261,7 +272,7 @@ def initialize() {
 }
 
 def changeHandler(evt) {
-	if(!globalEnable || !getTimeOk() || !getDaysOk() ) 
+	if(!globalEnable || !getTimeOk() || !getDaysOk() || !getModeOk() || !getSwitchOk() ) 
 		return true
     if (lights)
     {
