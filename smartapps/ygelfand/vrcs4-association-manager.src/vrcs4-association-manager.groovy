@@ -69,7 +69,12 @@ def configured() {
 
 def buttonEvent(evt){
     (1..4).each {
-      settings['switches_'+it]*.poll()
+      settings['switches_'+it].each {
+      	if(it.hasCommand('poll')) {
+          it.poll()
+        }
+      }
+      //settings['switches_'+it]*.poll()
      }
 	return;
 }
