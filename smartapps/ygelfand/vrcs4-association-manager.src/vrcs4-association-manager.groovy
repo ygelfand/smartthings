@@ -72,6 +72,8 @@ def buttonEvent(evt){
       settings['switches_'+it].each {
       	if(it.hasCommand('poll')) {
           it.poll()
+        } else if (it.hasCommand('ping')) {
+          it.ping()
         }
       }
       //settings['switches_'+it]*.poll()
